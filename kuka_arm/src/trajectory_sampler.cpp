@@ -17,6 +17,7 @@ TrajectorySampler::TrajectorySampler(ros::NodeHandle nh)
     move_group(PLANNING_GROUP),
     eef_group(GRIPPER_GROUP)
 {
+  ROS_INFO("--------------- checkpoint1 ---------------");
   /*
    * Setup:
    * Load robot model, robot state, set planning_scene
@@ -28,8 +29,8 @@ TrajectorySampler::TrajectorySampler(ros::NodeHandle nh)
   robot_state::RobotState robot_kinematic_state(kinematic_model);
 
   // Get demo param
-  bool demo;
-  ros::param::get("trajectory_sampler/demo", demo);
+  bool demo=true;
+  // ros::param::get("trajectory_sampler/demo", demo);
 
   // set RRT as the planner and set allowed planning time
   move_group.setPlannerId("RRTkConfigDefault");
@@ -132,7 +133,6 @@ TrajectorySampler::TrajectorySampler(ros::NodeHandle nh)
     visual_tools.trigger();
     visual_tools.prompt("next step");
 
-
     /*
      * Get Pick and Drop location from param server
      * Plan motion to pick location
@@ -164,11 +164,17 @@ TrajectorySampler::TrajectorySampler(ros::NodeHandle nh)
     bin_pose.position.y = bin_y;
     bin_pose.position.z = bin_z + 1.6;
 
+    ROS_INFO("--------------- checkpoint2 ---------------");
+
     // set starting pose
     move_group.setStartStateToCurrentState();
 
+    ROS_INFO("--------------- checkpoint3 ---------------");
+
     // set target pose
     move_group.setPoseTarget(target_pose);
+
+    ROS_INFO("--------------- checkpoint4 ---------------");
 
     // slow down movement of the robot
     move_group.setMaxVelocityScalingFactor(0.2);
@@ -176,18 +182,22 @@ TrajectorySampler::TrajectorySampler(ros::NodeHandle nh)
 
     // define plan object which will hold the planned trajectory
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-
+    ROS_INFO("--------------- checkpoint5 ---------------");
     bool success = move_group.plan(my_plan);
+    ROS_INFO("--------------- checkpoint6 ---------------");
+
     ROS_INFO("Visualizing plan to target: %s",
              success ? "SUCCEEDED" : "FAILED");
 
     // Visualize the plan
-    visual_tools.publishAxisLabeled(target_pose, "target_pose");
-    visual_tools.publishText(text_pose, "Displaying plan to target location",
-                             rviz_visual_tools::WHITE, rviz_visual_tools::XXXXLARGE);
-    visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
-    visual_tools.trigger();
+    // visual_tools.publishAxisLabeled(target_pose, "target_pose");
+    // visual_tools.publishText(text_pose, "Displaying plan to target location",
+    //                          rviz_visual_tools::WHITE, rviz_visual_tools::XXXXLARGE);
+    // visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
+    // visual_tools.trigger();
     visual_tools.prompt("next step");
+
+    ROS_INFO("--------------- checkpoint7 ---------------");
 
     /*
      * Convert plan to a set of eef poses for IK calculation
@@ -355,9 +365,9 @@ TrajectorySampler::TrajectorySampler(ros::NodeHandle nh)
 
     // Visualize the plan
     visual_tools.publishAxisLabeled(bin_pose, "drop_pose");
-    visual_tools.publishText(text_pose, "Displaying plan to drop-off location",
-                             rviz_visual_tools::WHITE, rviz_visual_tools::XXXXLARGE);
-    visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
+    // visual_tools.publishText(text_pose, "Displaying plan to drop-off location",
+    //                          rviz_visual_tools::WHITE, rviz_visual_tools::XXXXLARGE);
+    // visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
     visual_tools.trigger();
     visual_tools.prompt("next step");
 
@@ -437,9 +447,9 @@ TrajectorySampler::TrajectorySampler(ros::NodeHandle nh)
                 robot_joint_positions.size(), srv.response.points[0].positions.size());
 
       // Display current state
-      visual_tools.publishText(text_pose, "Moving to the drop-off location",
-                               rviz_visual_tools::WHITE, rviz_visual_tools::XXXXLARGE);
-      visual_tools.trigger();
+      // visual_tools.publishText(text_pose, "Moving to the drop-off location",
+      //                          rviz_visual_tools::WHITE, rviz_visual_tools::XXXXLARGE);
+      // visual_tools.trigger();
 
       // Use joints calculated by IK_server for motion
       for (std::size_t i = 0; i < srv.response.points.size(); ++i)
